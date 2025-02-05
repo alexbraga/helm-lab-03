@@ -8,8 +8,10 @@ spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
+  {{- if .Values.persistence.enabled }}
   strategy:
-    type: {{ .Values.strategyType  }}
+    type: Recreate
+  {{- end }}
   selector:
     matchLabels:
       {{- include "theia.selectorLabels" . | nindent 6 }}
@@ -60,11 +62,13 @@ spec:
           {{- end }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
+          - mountPath: {{ .Values.persistence.path }}
+            name: ide-disk
           {{- end }}
-      {{- with .Values.volumes }}
+      {{- if .Values.persistence.enabled }}
       volumes:
-        {{- toYaml . | nindent 8 }}
+      - name: ide-disk
+        persistentVolumeClaim: {{ include "theia.fullname" . }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
