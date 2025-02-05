@@ -68,7 +68,8 @@ spec:
       {{- if .Values.persistence.enabled }}
       volumes:
       - name: ide-disk
-        persistentVolumeClaim: {{ include "theia.fullname" . }}
+        persistentVolumeClaim:
+          claimName: {{ include "theia.fullname" . }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
